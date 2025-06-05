@@ -15,7 +15,7 @@ openai_client = openai.OpenAI(
 GOOGLE_CREDENTIALS_FILE = 'citizen-input-89e393467ee6.json'
 SHEET_NAME = 'Opinions Spreadsheet'
 DOC_ID = '1WFngQxjim2M7geC30rGb5ft4H1pEavQ_IoSl9IWLt-s'  # 🔁 Use your own doc ID here
-MODEL = 'gpt-4o'
+MODEL = 'o3'
 # ===============
 
 # === Setup Google APIs ===
@@ -29,7 +29,10 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(GOOGLE_CREDENTIALS_FILE
 # Google Sheets
 client = gspread.authorize(creds)
 sheet = client.open(SHEET_NAME).get_worksheet_by_id(558979275)
-df = pandas.DataFrame(sheet.get_all_records())
+records = sheet.get_all_records()
+if not records:
+    raise ValueError("No opinions found in the sheet.")
+df = pandas.DataFrame(records)
 
 # Google Docs
 docs_service = build('docs', 'v1', credentials=creds)
